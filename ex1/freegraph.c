@@ -16,6 +16,6 @@ void deallocate(struct N *p) {
         //printf("3");
         deallocate(p->z);
         //printf("4");
+        free(p);
     }
-    free(p);
 }
