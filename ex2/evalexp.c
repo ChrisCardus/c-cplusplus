@@ -9,50 +9,40 @@ typedef struct env
     struct env *next;
 } enviro;
 
-enviro newVar(struct exp *e, struct env *env)
-{
-    if(env->value)
-    {
-        struct env *new = malloc(sizeof(enviro));
-        strncpy(new->name, e->var, 8);
-        new->next = env;
-        new->value = evalexp(e->bexp);
-        return *new;
-    }
-    else
-    {
-        strncpy(env->name, e->var, 8);
-        env->value = evalexp(e->bexp);
-        return *env;
-    }
-}
-
 // Checks the enviroment list to see if the variable exists in it. If not, it adds the variable to the environment.
-int evalexpenv(struct exp *e, struct env *env)
+int evalexpvar(struct exp *e, struct env *env)
 {
-    enviro *current = env;
-    do
+    enviro *current = env->next;
+    while(current)
     {
-        if(current->name == e->var)
+        if(strcmp(current->name, e->var) == 0)
         {
             return current->value;
         }
         current = current->next;
-    } while(current->next);
+    }
     return 0;
 }
 
-int evalexp(struct exp *e)
+int evalexpenv(struct exp *e, struct env *env)
 {
-    enviro *head = malloc(sizeof(enviro));
-    head->value = (int)NULL;
-    head->next = NULL;
-
     switch(e->tag)
     {
         case islet :
-            *head = newVar(e, head);
-            return evalexp(e->body);
+            if(1==1)
+            {
+                enviro *position = env;
+                while(position->next)
+                {
+                    position = position->next;
+                }
+
+                enviro *new = malloc(sizeof(enviro));
+                strncpy(new->name, e->bvar, 8);
+                new->value = evalexpenv(e->bexp, env);
+                position->next = new;
+                return evalexpenv(e->body, env);
+            }
         break;
 
         case isconstant :
@@ -60,7 +50,7 @@ int evalexp(struct exp *e)
         break;
 
         case isvar :
-            return evalexpenv(e, head);
+            return evalexpvar(e, env);
         break;
 
         case isopapp :
@@ -72,7 +62,7 @@ int evalexp(struct exp *e)
                         int total = 0;
                         while(current)
                         {
-                            total = total + evalexp(current->head);
+                            total = total + evalexpenv(current->head, env);
                             current = current->tail;
                         }
                         return total;
@@ -86,10 +76,10 @@ int evalexp(struct exp *e)
                 case ismult :
                     if (e->exps) {
                         struct explist *current = e->exps;
-                        int total = 0;
+                        int total = 1;
                         while(current)
                         {
-                            total = total * evalexp(current->head);
+                            total = total * evalexpenv(current->head, env);
                             current = current->tail;
                         }
                         return total;
@@ -102,4 +92,11 @@ int evalexp(struct exp *e)
             }
         break;
     }
+}
+
+int evalexp(struct exp *e)
+{
+    enviro *head = malloc(sizeof(enviro));
+    head->next = NULL;
+    return evalexpenv(e, head);
 }
