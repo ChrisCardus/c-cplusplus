@@ -120,6 +120,23 @@ void deallocateList(node_list *head) {
 }
 
 void deallocate(struct N *p) {
+<<<<<<< HEAD
+    if(p){
+        printf("True\n");
+    } else {
+        printf("False\n");
+    }
+    while (p) {
+        //printf("1");
+        deallocate(p->x);
+        //printf("2");
+        deallocate(p->y);
+        //printf("3");
+        deallocate(p->z);
+        //printf("4");
+        free(p);
+    }
+=======
 
     // Create a pointer to the head of the list.
     node_list *head;
@@ -159,4 +176,5 @@ void deallocate(struct N *p) {
     }
 
     deallocateList(head);
+>>>>>>> f7bd0d53ba9580b83f82efa2ec04ec37db5dc17d
 }
