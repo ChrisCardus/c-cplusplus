@@ -10,26 +10,86 @@ typedef struct Node Node;
 
 Node* insertNode(Node *root, int value)
 {
-	/*
-	describe 
-
-	*/
+	Node *selector = root;
+	int finished = 0;
+	if(root != NULL)
+	{
+		while(finished == 0)
+		{
+			if(value > selector->data)
+			{
+				if(selector->right != NULL)
+				{
+					selector = selector->right;
+				}
+				else
+				{
+					Node *new_node = malloc(sizeof(Node));
+					new_node->data = value;
+					new_node->left = NULL;
+					new_node->right = NULL;
+					selector->right = new_node;
+					finished = 1;
+				}
+			}
+			else
+			{
+				if(selector->left != NULL)
+				{
+					selector = selector->left;
+				}
+				else
+				{
+					Node *new_node = malloc(sizeof(Node));
+					new_node->data = value;
+					new_node->left = NULL;
+					new_node->right = NULL;
+					selector->left = new_node;
+					finished = 1;
+				}
+			}
+		}
+		selector->data = value;
+	}
+	else
+	{
+		root = malloc(sizeof(Node));
+		root->data = value;
+		root->left = NULL;
+		root->right = NULL;
+	}
+	
 	return root;
 }
 
 void freeSubtree(Node *N){
-	/*
-	describe 
-
-	*/
+	if(N != NULL)
+	{
+		if(N->left != NULL)
+		{
+			freeSubtree(N->left);
+		}
+		if(N->right != NULL)
+		{
+			freeSubtree(N->right);
+		}
+		free(N);
+	}
 }
 
 void printSubtree(Node *N)
 {
-	/*
-	describe 
-
-	*/
+	if(N->left != NULL)
+	{
+		printf("left != NULL: %d\n", N->data);
+		printSubtree(N->left);
+	}
+	printf("%d\n", N->data);
+	if(N->right != NULL)
+	{
+		printf("right != NULL: %d\n", N->data);
+		printSubtree(N->right);
+	}
 }
 
 int countNodes(Node *N)

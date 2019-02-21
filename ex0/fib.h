@@ -1,1 +1,0 @@
-long fib(long n);

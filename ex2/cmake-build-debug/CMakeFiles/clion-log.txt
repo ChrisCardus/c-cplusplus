@@ -1,4 +1,0 @@
-"/var/host/media/removable/Chromebook Remov/clion-2017.3.3/bin/cmake/bin/cmake" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/media/removable/Chromebook Remov/work/c-cplusplus/ex2"
--- Configuring done
--- Generating done
--- Build files have been written to: /media/removable/Chromebook Remov/work/c-cplusplus/ex2/cmake-build-debug
