@@ -49,7 +49,6 @@ Node* insertNode(Node *root, int value)
 				}
 			}
 		}
-		selector->data = value;
 	}
 	else
 	{
@@ -58,7 +57,6 @@ Node* insertNode(Node *root, int value)
 		root->left = NULL;
 		root->right = NULL;
 	}
-	
 	return root;
 }
 
@@ -81,13 +79,11 @@ void printSubtree(Node *N)
 {
 	if(N->left != NULL)
 	{
-		printf("left != NULL: %d\n", N->data);
 		printSubtree(N->left);
 	}
 	printf("%d\n", N->data);
 	if(N->right != NULL)
 	{
-		printf("right != NULL: %d\n", N->data);
 		printSubtree(N->right);
 	}
 }
@@ -96,21 +92,90 @@ int countNodes(Node *N)
 {
 	int count=0;
 
-	/*
-	describe 
-
-	*/
+	if(N->left != NULL)
+	{
+		count += countNodes(N->left);
+	}
+	count++;
+	if(N->right != NULL)
+	{
+		count += countNodes(N->right);
+	}
 
 	return count;
 }	
 
 Node* deleteNode(Node* root, int value)
 {
-
-	/*
-	describe 
-
-	*/
+	int finished = 0;
+	//Check if selector is left or right branch from parent.
+	int lr = 0;
+	Node *selector = root;
+	Node *parent = root;
+	while(!finished)
+	{
+		if (value == selector->data) {
+			selector->data = NULL;
+			int left = countNodes(selector->left);
+			int right = countNodes(selector->right);
+			if(left == NULL && right == NULL)
+			{
+				if (lr < 0)
+				{
+					parent->left = NULL;
+				}
+				else if (lr > 0)
+				{
+					parent->right = NULL;
+				}
+			}
+			else if(right == NULL)
+			{
+				if(lr < 0)
+				{
+					parent->left = selector->left;
+				}
+				else if(lr > 0)
+				{
+					parent->right = selector->left;
+				}
+			}
+			else if (left == NULL)
+			{
+				if(lr < 0)
+				{
+					parent->left = selector->right;
+				}
+				else if(lr > 0)
+				{
+					parent->right = selector->right;
+				}
+			}
+			else if (left >= right)
+			{
+				
+			}
+			else
+			{
+				
+			}
+			
+			free(selector);
+			
+		}
+		else if(value <= selector->data)
+		{
+			parent = selector;
+			lr = -1;
+			selector = selector->left;
+		}
+		else if (value > selector->data)
+		{
+			parent = selector;
+			lr = 1;
+			selector = selector->right;
+		}
+	}
 	
   	return root; // parent node can update reference
 }
@@ -127,6 +192,13 @@ int main()
 	root=insertNode(root, 8);
    	printSubtree(root);
 	printf("\n");
+	//
+	for(int i = 0; i < 20; i++)
+	{
+		root=insertNode(root, i);
+	}
+	//
+
 	root=deleteNode(root,14);
 	root=deleteNode(root,8);
    	printSubtree(root);
