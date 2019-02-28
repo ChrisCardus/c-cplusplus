@@ -72,6 +72,7 @@ void freeSubtree(Node *N){
 			freeSubtree(N->right);
 		}
 		free(N);
+		N = NULL;
 	}
 }
 
@@ -92,92 +93,165 @@ int countNodes(Node *N)
 {
 	int count=0;
 
-	if(N->left != NULL)
+	if(N != NULL)
 	{
-		count += countNodes(N->left);
-	}
-	count++;
-	if(N->right != NULL)
-	{
-		count += countNodes(N->right);
+		if(N->left != NULL)
+		{
+			count += countNodes(N->left);
+		}
+		count++;
+		if(N->right != NULL)
+		{
+			count += countNodes(N->right);
+		}
 	}
 
 	return count;
 }	
 
+void insertTree(Node* root, Node* values)
+{
+	if(values != NULL)
+	{
+		if(values->left != NULL)
+		{
+			insertTree(root, values->left);
+		}
+		insertNode(root, values->data);
+		if(values->right != NULL)
+		{
+			insertTree(root, values->right);
+		}
+		free(values);
+	}
+}
+
 Node* deleteNode(Node* root, int value)
 {
-	int finished = 0;
-	//Check if selector is left or right branch from parent.
-	int lr = 0;
-	Node *selector = root;
-	Node *parent = root;
-	while(!finished)
+	if(root == NULL)								//Checks that the tree actually contains data.
 	{
-		if (value == selector->data) {
-			selector->data = NULL;
-			int left = countNodes(selector->left);
-			int right = countNodes(selector->right);
-			if(left == NULL && right == NULL)
+		printf("Cannot delete the node as the tree is empty.\n");
+		return root;
+	}
+	int finished = 0;									//Allows us to loop for an unspecified number of times.
+	int lr = 0;											//Check if selector is left or right branch from parent.
+	Node *selector = root;								//Keeps track of which node is in focus.
+	Node *parent = root;								//Keeps track of the node that was previously the focus.
+	while(finished == 0)								//Allows us to loop for an unspecified number of times.
+	{
+		if(selector == NULL)							//Makes sure that the current focus node isn't empty.
+		{
+			printf("Node %d does not exist within the tree.\n", value);
+			return root;
+		}
+		if (value == selector->data) {					//Checks if we have reached the node we are looking to delete.
+			int left = countNodes(selector->left);		//Counts the number of nodes in the left subtree from the node we are deleting.
+			int right = countNodes(selector->right);	//Counts the number of nodes in the right subtree from the node we are deleting.
+			if(left == 0 && right == 0)					//Checks if both left and right subtrees are empty.
 			{
-				if (lr < 0)
+				if (lr < 0)								//Checks if the node in focus is part of the left or the right branch of the parent.
 				{
-					parent->left = NULL;
+					parent->left = NULL;				//Replaces the pointer to the deleted node with NULL.
 				}
 				else if (lr > 0)
 				{
+					parent->right = NULL;				//Replaces the pointer to the deleted node with NULL.
+				}
+			}
+			else if(right == 0)							//Checks if the right subtree is empty.
+			{
+				if(lr < 0)
+				{
+					parent->left = selector->left;		//Replaces the pointer to the deleted node with the left subtree.
+				}
+				else if(lr > 0)
+				{
+					parent->right = selector->left;		//Replaces the pointer to the deleted node with the left subtree.
+				}
+			}
+			else if (left == 0)							//Checks if the left subtree is empty.
+			{
+				if(lr < 0)
+				{
+					parent->left = selector->right;		//Replaces the pointer to the deleted node with the right subtree.
+				}
+				else if(lr > 0)
+				{
+					parent->right = selector->right;	//Replaces the pointer to the deleted node with the right subtree.
+				}
+			}
+			else if (left >= right)						//Checks if the left subtree is the same size as or larger than the right subtree.
+			{
+				Node *right = selector->right;			//Create a pointer to the right subtree of the deleted node.
+				selector = selector->left;				//Moves the selector one step down the left subtree.
+				Node *temp = selector->right;			//Create a pointer to the right subtree of the node to be moved.
+				selector->right = right;				//Change the right subtree pointer to the right subtree of the deleted node.
+				insertTree(right, temp);				//Reinsert the nodes from the temp subtree to the new subtree.
+				if(lr < 0)								//Checks if the replacement node should come from the left or right branch of the parent.
+				{
+					free(parent->left);
+					parent->left = NULL;
+					parent->left = selector;			//Replaces the pointer to the deleted node with a pointer to the replacement node.
+				}
+				else if (lr > 0)
+				{
+					free(parent->right);
 					parent->right = NULL;
+					parent->right = selector;			//Replaces the pointer to the deleted node with a pointer to the replacement node.
 				}
-			}
-			else if(right == NULL)
-			{
-				if(lr < 0)
+				else
 				{
-					parent->left = selector->left;
+					free(parent);
+					parent = NULL;
+					root = selector;
 				}
-				else if(lr > 0)
-				{
-					parent->right = selector->left;
-				}
-			}
-			else if (left == NULL)
-			{
-				if(lr < 0)
-				{
-					parent->left = selector->right;
-				}
-				else if(lr > 0)
-				{
-					parent->right = selector->right;
-				}
-			}
-			else if (left >= right)
-			{
 				
 			}
 			else
 			{
+				Node *left = selector->left;			//Create a pointer to the left subtree of the deleted node.
+				selector = selector->right;				//Moves the selector one step down the right subtree.
+				Node *temp = selector->left;			//Create a pointer to the left subtree of the node to be moved.
+				selector->left = left;					//Change the left subtree pointer to the left subtree of the deleted node.
+				insertTree(left, temp);					//Reinsert the nodes from the temp subtree to the new subtree.
+				if(lr < 0)								//Checks if the replacement node should come from the left or right branch of the parent.
+				{
+					free(parent->left);
+					parent->left = NULL;
+					parent->left = selector;			//Replaces the pointer to the deleted node with a pointer to the replacement node.
+				}
+				else if (lr > 0)
+				{
+					free(parent->right);
+					parent->right = NULL;
+					parent->right = selector;			//Replaces the pointer to the deleted node with a pointer to the replacement node.
+				}
+				else
+				{
+					free(parent);
+					parent = NULL;
+					root = selector;
+				}
 				
 			}
-			
-			free(selector);
+			finished = 1;								//Signals that the loop can now finish.
 			
 		}
-		else if(value <= selector->data)
+		else if(value <= selector->data)				//Checks if the node value we are searching for is less than or equal to the current node.
 		{
-			parent = selector;
-			lr = -1;
-			selector = selector->left;
+			parent = selector;							//Move the parent node one step down the tree.
+			lr = -1;									//Record which branch from the parent the selector is moving.
+			selector = selector->left;					//Move the selector one step down the left branch of the tree.
 		}
-		else if (value > selector->data)
+		else if (value > selector->data)				//Checks if the node value we are searching for is greater than the current node.
 		{
-			parent = selector;
-			lr = 1;
-			selector = selector->right;
+			parent = selector;							//Move the parent node one step down the tree.
+			lr = 1;										//Record which branch from the parent the selector is moving.
+			selector = selector->right;					//Move the selector one step down the right branch of the tree.
 		}
 	}
 	
-  	return root; // parent node can update reference
+  	return root; 										//Return the tree with the specified node now removed.
 }
 
 int main()
@@ -192,12 +266,6 @@ int main()
 	root=insertNode(root, 8);
    	printSubtree(root);
 	printf("\n");
-	//
-	for(int i = 0; i < 20; i++)
-	{
-		root=insertNode(root, i);
-	}
-	//
 
 	root=deleteNode(root,14);
 	root=deleteNode(root,8);
