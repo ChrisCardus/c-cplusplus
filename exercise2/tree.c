@@ -24,7 +24,9 @@ Node* insertNode(Node *root, int value)
 				}
 				else
 				{
-					Node *new_node = malloc(sizeof(Node));
+					Node *new_node;
+					if((new_node = malloc(sizeof(Node))) == NULL)
+						printf("Memory cannot be allocated.\n");
 					new_node->data = value;
 					new_node->left = NULL;
 					new_node->right = NULL;
@@ -40,7 +42,9 @@ Node* insertNode(Node *root, int value)
 				}
 				else
 				{
-					Node *new_node = malloc(sizeof(Node));
+					Node *new_node;
+					if((new_node = malloc(sizeof(Node))) == NULL)
+						printf("Memory cannot be allocated.\n");
 					new_node->data = value;
 					new_node->left = NULL;
 					new_node->right = NULL;
@@ -52,7 +56,8 @@ Node* insertNode(Node *root, int value)
 	}
 	else
 	{
-		root = malloc(sizeof(Node));
+		if((root = malloc(sizeof(Node))) == NULL)
+			printf("Memory cannot be allocated.\n");
 		root->data = value;
 		root->left = NULL;
 		root->right = NULL;
@@ -66,13 +71,14 @@ void freeSubtree(Node *N){
 		if(N->left != NULL)
 		{
 			freeSubtree(N->left);
+			N->left = NULL;
 		}
 		if(N->right != NULL)
 		{
 			freeSubtree(N->right);
+			N->right = NULL;
 		}
 		free(N);
-		N = NULL;
 	}
 }
 
@@ -93,7 +99,7 @@ int countNodes(Node *N)
 {
 	int count=0;
 
-	if(N != NULL)
+	if(N)
 	{
 		if(N->left != NULL)
 		{
@@ -117,11 +123,11 @@ void insertTree(Node* root, Node* values)
 		{
 			insertTree(root, values->left);
 		}
-		insertNode(root, values->data);
 		if(values->right != NULL)
 		{
 			insertTree(root, values->right);
 		}
+		insertNode(root, values->data);
 		free(values);
 	}
 }
@@ -151,10 +157,12 @@ Node* deleteNode(Node* root, int value)
 			{
 				if (lr < 0)								//Checks if the node in focus is part of the left or the right branch of the parent.
 				{
+					free(parent->left);
 					parent->left = NULL;				//Replaces the pointer to the deleted node with NULL.
 				}
 				else if (lr > 0)
 				{
+					free(parent->right);
 					parent->right = NULL;				//Replaces the pointer to the deleted node with NULL.
 				}
 			}
@@ -162,10 +170,12 @@ Node* deleteNode(Node* root, int value)
 			{
 				if(lr < 0)
 				{
+					free(parent->left);
 					parent->left = selector->left;		//Replaces the pointer to the deleted node with the left subtree.
 				}
 				else if(lr > 0)
 				{
+					free(parent->right);
 					parent->right = selector->left;		//Replaces the pointer to the deleted node with the left subtree.
 				}
 			}
@@ -173,10 +183,12 @@ Node* deleteNode(Node* root, int value)
 			{
 				if(lr < 0)
 				{
+					free(parent->left);
 					parent->left = selector->right;		//Replaces the pointer to the deleted node with the right subtree.
 				}
 				else if(lr > 0)
 				{
+					free(parent->right);
 					parent->right = selector->right;	//Replaces the pointer to the deleted node with the right subtree.
 				}
 			}
@@ -190,19 +202,16 @@ Node* deleteNode(Node* root, int value)
 				if(lr < 0)								//Checks if the replacement node should come from the left or right branch of the parent.
 				{
 					free(parent->left);
-					parent->left = NULL;
 					parent->left = selector;			//Replaces the pointer to the deleted node with a pointer to the replacement node.
 				}
 				else if (lr > 0)
 				{
 					free(parent->right);
-					parent->right = NULL;
 					parent->right = selector;			//Replaces the pointer to the deleted node with a pointer to the replacement node.
 				}
 				else
 				{
 					free(parent);
-					parent = NULL;
 					root = selector;
 				}
 				
@@ -217,19 +226,16 @@ Node* deleteNode(Node* root, int value)
 				if(lr < 0)								//Checks if the replacement node should come from the left or right branch of the parent.
 				{
 					free(parent->left);
-					parent->left = NULL;
 					parent->left = selector;			//Replaces the pointer to the deleted node with a pointer to the replacement node.
 				}
 				else if (lr > 0)
 				{
 					free(parent->right);
-					parent->right = NULL;
 					parent->right = selector;			//Replaces the pointer to the deleted node with a pointer to the replacement node.
 				}
 				else
 				{
 					free(parent);
-					parent = NULL;
 					root = selector;
 				}
 				
@@ -258,7 +264,6 @@ int main()
 {
 	Node *root=NULL;
 	
-	
     root=insertNode(root, 14);
 	root=insertNode(root, 12);
 	root=insertNode(root, 6);
@@ -273,10 +278,4 @@ int main()
 	freeSubtree(root);
 	printf("Number of nodes=%d\n", countNodes(root));
 	return 0;
-
-	return 0;
 }
-
-
-
-
