@@ -12,7 +12,7 @@ Node* insertNode(Node *root, int value)
 {
 	Node *selector = root;
 	int finished = 0;
-	if(root != NULL)
+	if(root)
 	{
 		while(finished == 0)
 		{
@@ -66,7 +66,7 @@ Node* insertNode(Node *root, int value)
 }
 
 void freeSubtree(Node *N){
-	if(N != NULL)
+	if(N)
 	{
 		if(N->left != NULL)
 		{
@@ -84,14 +84,17 @@ void freeSubtree(Node *N){
 
 void printSubtree(Node *N)
 {
-	if(N->left != NULL)
+	if(N)
 	{
-		printSubtree(N->left);
-	}
-	printf("%d\n", N->data);
-	if(N->right != NULL)
-	{
-		printSubtree(N->right);
+		if(N->left != NULL)
+		{
+			printSubtree(N->left);
+		}
+		printf("%d\n", N->data);
+		if(N->right != NULL)
+		{
+			printSubtree(N->right);
+		}
 	}
 }
 
@@ -134,7 +137,7 @@ void insertTree(Node* root, Node* values)
 
 Node* deleteNode(Node* root, int value)
 {
-	if(root == NULL)								//Checks that the tree actually contains data.
+	if(root == NULL)									//Checks that the tree actually contains data.
 	{
 		printf("Cannot delete the node as the tree is empty.\n");
 		return root;
